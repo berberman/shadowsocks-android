@@ -21,24 +21,24 @@
 package com.github.shadowsocks.bg
 
 import android.app.KeyguardManager
-import android.content.Context
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
-import android.support.annotation.RequiresApi
-import com.github.shadowsocks.App.Companion.app
+import android.service.quicksettings.TileService as BaseTileService
+import androidx.annotation.RequiresApi
+import androidx.core.content.getSystemService
+import com.github.shadowsocks.Core
 import com.github.shadowsocks.R
 import com.github.shadowsocks.ShadowsocksConnection
 import com.github.shadowsocks.aidl.IShadowsocksService
 import com.github.shadowsocks.aidl.IShadowsocksServiceCallback
 import com.github.shadowsocks.preference.DataStore
-import android.service.quicksettings.TileService as BaseTileService
 
 @RequiresApi(24)
 class TileService : BaseTileService(), ShadowsocksConnection.Interface {
     private val iconIdle by lazy { Icon.createWithResource(this, R.drawable.ic_service_idle) }
     private val iconBusy by lazy { Icon.createWithResource(this, R.drawable.ic_service_busy) }
     private val iconConnected by lazy { Icon.createWithResource(this, R.drawable.ic_service_active) }
-    private val keyguard by lazy { getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager }
+    private val keyguard by lazy { getSystemService<KeyguardManager>()!! }
 
     override val serviceCallback: IShadowsocksServiceCallback.Stub by lazy {
         @RequiresApi(24)
@@ -88,8 +88,8 @@ class TileService : BaseTileService(), ShadowsocksConnection.Interface {
     private fun toggle() {
         val service = connection.service ?: return
         when (service.state) {
-            BaseService.STOPPED -> app.startService()
-            BaseService.CONNECTED -> app.stopService()
+            BaseService.STOPPED -> Core.startService()
+            BaseService.CONNECTED -> Core.stopService()
         }
     }
 }
